@@ -5,10 +5,10 @@
 ## Table of Contents
 
 - [Introduction](#introduction)
-- [System Design](#sytem_design)
+- [System Design](#sytemdesign)
 - [Requirements](#requirements)
 - [Installion](#installation)
-- [Usage](#usage)
+- [Getting Started](#gettingstarted)
 - [Advanced Features](#advanced-features)
 - [Sample Queries](#sample-queries)
 
@@ -70,16 +70,37 @@ This architecture ensures efficient log handling, periodic processing, and fast 
 
 
 ## Requirements
-
-Specify any prerequisites or dependencies needed to run the project.
+1. Latest version of `docker` and `docker compose` [Link](https://docs.docker.com/engine/install/ubuntu/)
+2. After installing `docker` and `docker compose` , do post installation steps [Link](https://docs.docker.com/engine/install/ubuntu/)
+3. `npm latest version`
+4. `node version 16`
+5. `make` (sudo apt install make) for easy use
 
 ## Getting Started
+1. Go to backend directory
+   ```bash
+   cd backend
+2. build the backend services
+   ```bash
+   make build
+3. if step-2 fails
+   ```bash
+   docker compose build
+4. start the services
+   ```bash
+   make restart
+5. if step-4 fails
+   ```bash
+   docker compose up
+ *Wait for 15-20 seconds so the services become stable*
 
-Provide step-by-step instructions on how to set up the project locally. Include installation steps, configuration details, and any initial setup required.
+ To start the Frontend 
+ 1. build project
+    ```bash
+    npm i
+ 2. start the project
+    ```bash
+    npm start
+ You can visit http://localhost:4200
 
-```bash
-# Example commands
-git clone https://github.com/your-username/your-repo.git
-cd your-repo
-npm install
 
