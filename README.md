@@ -94,6 +94,10 @@ This architecture ensures efficient log handling, periodic processing, and fast 
  *Wait for 15-20 seconds so the services become stable*
 
  To start the Frontend 
+ Go to frontend directory i.e `/LogIngestor/frontend/`
+ ```bash
+ cd frontend
+ ```
  1. build project
     ```bash
     npm i
