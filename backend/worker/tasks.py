@@ -17,6 +17,7 @@ def consume_first_100_messages(self):
     messages_fetched = 0
     messages = []
     objects_to_be_created = []
+    delivery_tags = []
 
     def callback(ch, method, properties, body):
 
@@ -24,9 +25,10 @@ def consume_first_100_messages(self):
         nonlocal batch_size
         nonlocal messages
         nonlocal objects_to_be_created
+        nonlocal delivery_tags
 
         messages_fetched = messages_fetched+1
-        ch.basic_ack(delivery_tag=method.delivery_tag)
+        delivery_tags.append(method.delivery_tag)
         log_payload = (json.loads(body))
         objects_to_be_created.append(
             Log(
@@ -62,6 +64,9 @@ def consume_first_100_messages(self):
             messages,
             index=ELASTICSEARCH_INDEX_NAME
         )
+        for delivery_tag in delivery_tags:
+            channel.basic_ack(delivery_tag=delivery_tag)
         print("logs Created to db and elasticsearch")
         messages = []
         objects_to_be_created = []
+        delivery_tags = []
