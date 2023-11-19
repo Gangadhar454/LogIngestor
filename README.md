@@ -9,8 +9,7 @@
 - [Requirements](#requirements)
 - [Installion](#installation)
 - [Getting Started](#gettingstarted)
-- [Advanced Features](#advanced-features)
-- [Sample Queries](#sample-queries)
+- [Features to Implement](#advanced-features)
 
 ## Introduction
 LogIngest is about ingesting heavy data and filtering logs from web page
@@ -151,6 +150,20 @@ This architecture ensures efficient log handling, periodic processing, and fast 
        "operation": "range"
     }
     ```
-    
+  #### Relation Table Structure
+  ```bash
+   level = CharactersField of max length 255
+    message = CharactersField of max length 255
+    resourceId = CharactersField of max length 255
+    timestamp = DateTimeField
+    traceId = CharactersField of max length 255
+    spanId = CharactersField of max length 255
+    commit = CharactersField of max length 255
+    metadata = JsonField
+  ```
 
-
+## Features to Implement
+1. Use `AWS - SQS` for storing log messages insteadh of rabbitmq
+2. Use `sockets` for realtime update. If something crashes in worker, the user gets notified
+3. Maintain more than 1 shard for elastic search index
+4. Impement combining multiple filters
