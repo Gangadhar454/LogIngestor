@@ -1,0 +1,54 @@
+
+<div class="p-2">
+  <div class="card container">
+    <div class=" card-body justify-content-center align-items-center center-div">
+        <form  [formGroup]="myForm" (ngSubmit)="doFilter()">
+          <div class="form-group">
+            <label class="center-block">Key:
+              <select class="form-control custom-select h-100" formControlName="key" (change)="onKeyChange()">
+                <option value="" disabled> Select Key</option>
+                <option value="{{item}}" *ngFor="let item of keys">{{item.charAt(0).toUpperCase() + item.slice(1)}}</option>
+              </select>
+            </label>
+          </div>
+          <div class="form-group">
+            <label class="center-block">Logical condition:
+              <select class="form-control custom-select h-100" formControlName="logicalCondition">
+                <option value="" disabled> Select logical condtion</option>
+                <option *ngIf="myForm.value.key == 'timestamp'" value="range">Range</option>
+                <option value="equals">Equals</option>
+                <option value="contains">Contains</option>
+              </select>
+            </label>
+          </div>
+          <div class="form-group" *ngIf="myForm.value.key == 'metadata'">
+            <label class="center-block">Meta data:
+              <input class="form-control" formControlName="metaData">
+            </label>
+          </div>
+          <div class="form-group" *ngIf="myForm.value.key == 'timestamp'">
+            <label class="center-block">Date range:
+              <input type="text" class="form-control" bsDaterangepicker formControlName="timestampRange" placeholder="Select Date range"/>
+            </label>
+          </div>
+          <div class="form-group" *ngIf="myForm.value.key !== 'timestamp'">
+            <label class="center-block">Search Value:
+              <input class="form-control" formControlName="searchValue" placeholder="Enter Search Value">
+            </label>
+          </div>
+          <div>
+            <button type="submit" class="btn btn-primary">Filter</button>
+          </div>
+        </form>
+    </div>
+  </div>
+  
+  <div class="card container">
+    <div class="card-title">
+      <h3>Response</h3>
+    </div>
+    <div class=" card-body justify-content-center align-items-center center-div">
+      {{response | json}}
+    </div>
+  </div>
+</div>

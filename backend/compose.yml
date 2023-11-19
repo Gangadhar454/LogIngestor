@@ -1,0 +1,115 @@
+version: '3.4'
+services:
+  worker:
+    restart: always
+    build:
+      context: .
+      dockerfile: ./worker/workerDockerFile
+    env_file: .env
+    volumes:
+      - /usr/src/app/static
+      - .:/app
+  scheduler:
+    restart: always
+    build:
+      context: .
+      dockerfile: ./worker/schedulerDockerFile
+    env_file: .env
+    volumes:
+      - /usr/src/app/static
+      - .:/app
+  celery-beat-queue:
+    image: rabbitmq:3.9-alpine
+    restart: unless-stopped
+    environment:
+      - RABBITMQ_DEFAULT_USER=rabbit
+      - RABBITMQ_DEFAULT_PASS=rabbitmq
+    container_name: celery-beat-queue
+    volumes:
+      - celery-beat-queue:/var/lib/rabbitmq
+    ports:
+      - "5672:5672"
+  log-messages-queue:
+    image: rabbitmq:3.9-alpine
+    restart: unless-stopped
+    environment:
+      - RABBITMQ_DEFAULT_USER=rabbit
+      - RABBITMQ_DEFAULT_PASS=rabbitmq
+    container_name: log-messages-queue
+    volumes:
+      - log-messages-queue:/var/lib/rabbitmq
+    ports:
+      - "5673:5673"
+  db:
+    image: postgres:alpine
+    restart: unless-stopped
+    volumes:
+      - db:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=root
+    ports:
+      - 5432:5432
+    command: ["postgres", "-c", "log_statement=all"]
+  logs_handler:
+    build:
+      context: .
+      dockerfile: ./logs_handler/DockerFile
+    command: bash -c "wait-for-it db:5432 -t 1m -- python manage.py runserver 0.0.0.0:3000"
+    volumes:
+      - .:/app
+    ports:
+      - "3000:3000"
+    env_file: .env
+    depends_on:
+      - db
+      - elasticsearch
+  setup-service:
+    image: curlimages/curl:latest
+    depends_on:
+      - elasticsearch
+    command: >
+      sh -c "
+        until curl -u \"$ELASTICSEARCH_USER:$ELASTICSEARCH_PASSWORD\" http://elasticsearch:9200; do sleep 5; done
+        curl -XPOST -H 'Content-Type: application/json' -u \"$ELASTICSEARCH_USER:$ELASTICSEARCH_PASSWORD\" http://elasticsearch:9200/_security/user/kibana_system/_password -d '{\"password\":\"$KIBANA_SYSTEM_PASSWORD\"}'
+      "
+    environment:
+      - ELASTICSEARCH_USER=${ELASTICSEARCH_USER}
+      - ELASTICSEARCH_PASSWORD=${ELASTICSEARCH_PASSWORD}
+  elasticsearch:
+    image: elasticsearch:8.6.0
+    container_name: elasticsearch
+    restart: always
+    ports:
+      - '9200:9200'
+    environment:
+      - discovery.type=single-node
+      - ELASTIC_PASSWORD=${ELASTICSEARCH_PASSWORD}
+      - xpack.security.enabled=true
+    volumes:
+      - elasticsearch-data:/usr/share/elasticsearch/data
+    mem_limit: 900m
+    cpus: 1
+    mem_reservation: 128m
+  kibana:
+    image: kibana:8.6.0
+    container_name: kibana
+    restart: always
+    environment:
+      - ELASTICSEARCH_HOSTS=${ELASTICSEARCH_HOST_URL}
+      - ELASTICSEARCH_USERNAME=kibana_system
+      - ELASTICSEARCH_PASSWORD=${KIBANA_SYSTEM_PASSWORD}
+      - xpack.security.enabled=true
+    volumes:
+      - kibana-data:/usr/share/kibana/data
+    ports:
+      - '5601:5601'
+    depends_on:
+      - elasticsearch
+volumes:
+  celery-beat-queue:
+  log-messages-queue:
+  db:
+  kibana-data:
+  elasticsearch-data:
