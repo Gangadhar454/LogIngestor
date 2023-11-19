@@ -103,4 +103,54 @@ This architecture ensures efficient log handling, periodic processing, and fast 
     npm start
  You can visit http://localhost:4200
 
+ ### API Endpoints
+ 1. #### API to Create Logs
+    `POST` - http://localhost:3000/logs/ingest/
+    Payload:
+    
+    ```json
+    {
+       "level": "error",
+       "message": "Failed to connect to DB",
+       "resourceId": "server-1234",
+       "timestamp": "2023-09-15T08:00:00Z",
+       "traceId": "abc-xyz-123",
+       "spanId": "span-456",
+       "commit": "5e5342f",
+       "metadata": {
+          "parentResourceId": "server-0987"
+       }
+    }
+    ```
+ 2. #### API to Filter Logs
+    `POST` - http://localhost:3000/logs/filter/
+    Payload:
+    
+    ```json
+    {
+       "key": "level",
+       "value": "server",
+       "operation": "equals"
+    }
+    ```
+    `Key` - represents the field by which we filter
+    `value` - is the target for our search.
+    `operation`:
+       "equals" - for full text search
+       "contains" - for pattern or part of text
+       "range" - for a range of time (can be used for only `timestamp`)
+
+    Filter logs between the timestamp, the payload should be like this
+    ```json
+    {
+       "key": "timestamp",
+       "value": {
+          "upper_range": "2023-09-15T23:59:59Z",
+          "lower_range": "2022-09-15T23:59:59Z"
+       },
+       "operation": "range"
+    }
+    ```
+    
+
 
