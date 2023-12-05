@@ -2,7 +2,7 @@ from django.shortcuts import render
 
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from dyte_project.settings import (
+from log_ingestor.settings import (
     elasticsearch_instance,
     pika_parameters,
     LOG_MESSAGES_QUEUE_NAME,

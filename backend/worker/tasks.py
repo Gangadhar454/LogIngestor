@@ -1,7 +1,7 @@
-from dyte_project.celery import app
+from log_ingestor.celery import app
 from logs_handler.models import Log
 from elasticsearch import helpers
-from dyte_project.settings import (
+from log_ingestor.settings import (
     elasticsearch_instance,
     pika_parameters,
     LOG_MESSAGES_QUEUE_NAME,
